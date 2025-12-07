@@ -6,14 +6,8 @@ var session = require('express-session');
 var mysql = require('mysql');
 var connection  = require('./lib/db');
 var usersRouter = require('./routes/users');
+
 var app = express();
-
-app.use(express.urlencoded({ extended: true }));
-
-app.get('/', (req, res) => {
-    res.redirect('/users');
-});
-
 
 // ====================
 // View Engine Setup
@@ -37,6 +31,17 @@ app.use(session({
 }));
 
 app.use(flash());
+
+// ====================
+// Correct Homepage Redirect
+// ====================
+app.get('/', (req, res) => {
+    res.redirect('/users');   // load the CRUD homepage
+});
+
+// ====================
+// Routes
+// ====================
 app.use('/users', usersRouter);
 
 // ====================
@@ -50,11 +55,8 @@ app.use(function(req, res, next) {
 // Error Handler
 // ====================
 app.use(function(err, req, res, next) {
-  // Set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // Render the error page
   res.status(err.status || 500);
   res.render('error');
 });
@@ -65,13 +67,4 @@ app.use(function(err, req, res, next) {
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
-
-server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use. Try another port or kill the process using it.`);
-    } else {
-        console.error(err);
-    }
-});
+    console.log(
