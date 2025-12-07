@@ -8,6 +8,8 @@ var connection  = require('./lib/db');
 var usersRouter = require('./routes/users');
 var app = express();
 
+app.use(express.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => {
     res.render('users/index');
 });
