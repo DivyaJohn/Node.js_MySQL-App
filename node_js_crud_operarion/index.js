@@ -6,8 +6,12 @@ var session = require('express-session');
 var mysql = require('mysql');
 var connection  = require('./lib/db');
 var usersRouter = require('./routes/users');
-
 var app = express();
+
+app.get('/', (req, res) => {
+    res.render('users/index');
+});
+
 
 // ====================
 // View Engine Setup
