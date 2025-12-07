@@ -2,190 +2,132 @@ var express = require('express');
 var router = express.Router();
 var dbConn  = require('../lib/db');
 
-// display user page
+// ====================
+// Display Users Page
+// ====================
 router.get('/', function(req, res, next) {      
-    dbConn.query('SELECT * FROM users ORDER BY id desc',function(err,rows){
-        if(err) {
+    dbConn.query('SELECT * FROM users ORDER BY id desc', function(err, rows) {
+        if (err) {
             req.flash('error', err);
-            res.render('users',{data:''});
+            res.render('users/index', { data: '' });
         } else {
-            res.render('users',{data:rows});
+            res.render('users/index', { data: rows });
         }
     });
 });
 
-// display user page
-router.get('/', function(req, res, next) {      
-    dbConn.query('SELECT * FROM users ORDER BY id desc',function(err,rows)     {
-        if(err) {
-            req.flash('error', err);
-            // render to views/users/index.ejs
-            res.render('users',{data:''});   
-        } else {
-            // render to views/users/index.ejs
-            res.render('users',{data:rows});
-        }
-    });
-});
-
-// display add user page
-router.get('/add', function(req, res, next) {    
-    // render to add.ejs
+// ====================
+// Display Add User Page
+// ====================
+router.get('/add', function(req, res) {    
     res.render('users/add', {
         name: '',
         email: '',
-        position:''
-    })
-})
+        position: ''
+    });
+});
 
-// add a new user
-router.post('/add', function(req, res, next) {    
+// ====================
+// Add New User
+// ====================
+router.post('/add', function(req, res) {    
 
     let name = req.body.name;
     let email = req.body.email;
     let position = req.body.position;
     let errors = false;
 
-    if(name.length === 0 || email.length === 0 || position === 0) {
+    if (name.length === 0 || email.length === 0 || position.length === 0) {
         errors = true;
-
-        // set flash message
-        req.flash('error', "Please enter name and email and position");
-        // render to add.ejs with flash message
-        res.render('users/add', {
-            name: name,
-            email: email,
-            position:position
-        })
+        req.flash('error', "Please enter name, email, and position");
+        res.render('users/add', { name, email, position });
     }
 
-    // if no error
-    if(!errors) {
-
-        var form_data = {
-            name: name,
-            email: email,
-            position:position
-        }
+    if (!errors) {
+        var form_data = { name, email, position };
         
-        // insert query
-        dbConn.query('INSERT INTO users SET ?', form_data, function(err, result) {
-            //if(err) throw err
+        dbConn.query('INSERT INTO users SET ?', form_data, function(err) {
             if (err) {
-                req.flash('error', err)
-                 
-                // render to add.ejs
-                res.render('users/add', {
-                    name: form_data.name,
-                    email: form_data.email,
-                    position:form_data.position
-                })
+                req.flash('error', err);
+                res.render('users/add', form_data);
             } else {                
                 req.flash('success', 'User successfully added');
                 res.redirect('/users');
             }
-        })
+        });
     }
-})
+});
 
-// display edit user page
-router.get('/edit/(:id)', function(req, res, next) {
+// ====================
+// Display Edit User Page
+// ====================
+router.get('/edit/:id', function(req, res) {
 
     let id = req.params.id;
    
-    dbConn.query('SELECT * FROM users WHERE id = ' + id, function(err, rows, fields) {
-        if(err) throw err
+    dbConn.query('SELECT * FROM users WHERE id = ?', [id], function(err, rows) {
+        if (err) throw err;
          
-        // if user not found
         if (rows.length <= 0) {
-            req.flash('error', 'User not found with id = ' + id)
-            res.redirect('/users')
-        }
-        // if user found
-        else {
-            // render to edit.ejs
+            req.flash('error', 'User not found with id = ' + id);
+            res.redirect('/users');
+        } else {
             res.render('users/edit', {
-                title: 'Edit User', 
                 id: rows[0].id,
                 name: rows[0].name,
                 email: rows[0].email,
                 position: rows[0].position
-            })
+            });
         }
-    })
-})
+    });
+});
 
-// update user data
-router.post('/update/:id', function(req, res, next) {
+// ====================
+// Update User
+// ====================
+router.post('/update/:id', function(req, res) {
 
     let id = req.params.id;
-    let name = req.body.name;
-    let email = req.body.email;
-    let position = req.body.position;
+    let { name, email, position } = req.body;
     let errors = false;
 
-    if(name.length === 0 || email.length === 0 || position.length === 0) {
+    if (name.length === 0 || email.length === 0 || position.length === 0) {
         errors = true;
-        
-        // set flash message
-        req.flash('error', "Please enter name and email and position");
-        // render to add.ejs with flash message
-        res.render('users/edit', {
-            id: req.params.id,
-            name: name,
-            email: email,
-            position:position
-        })
+        req.flash('error', "Please enter all fields");
+        res.render('users/edit', { id, name, email, position });
     }
 
-    // if no error
-    if( !errors ) {   
- 
-        var form_data = {
-            name: name,
-            email: email,
-            position:position
-        }
-        // update query
-        dbConn.query('UPDATE users SET ? WHERE id = ' + id, form_data, function(err, result) {
-            //if(err) throw err
+    if (!errors) {
+        var form_data = { name, email, position };
+
+        dbConn.query('UPDATE users SET ? WHERE id = ?', [form_data, id], function(err) {
             if (err) {
-                // set flash message
-                req.flash('error', err)
-                // render to edit.ejs
-                res.render('users/edit', {
-                    id: req.params.id,
-                    name: form_data.name,
-                    email: form_data.email,
-                    position: form_data.position
-                })
+                req.flash('error', err);
+                res.render('users/edit', { id, name, email, position });
             } else {
                 req.flash('success', 'User successfully updated');
                 res.redirect('/users');
             }
-        })
+        });
     }
-})
-   
-// delete user
-router.get('/delete/(:id)', function(req, res, next) {
+});
+
+// ====================
+// Delete User
+// ====================
+router.get('/delete/:id', function(req, res) {
 
     let id = req.params.id;
      
-    dbConn.query('DELETE FROM users WHERE id = ' + id, function(err, result) {
-        //if(err) throw err
+    dbConn.query('DELETE FROM users WHERE id = ?', [id], function(err) {
         if (err) {
-            // set flash message
-            req.flash('error', err)
-            // redirect to user page
-            res.redirect('/users')
+            req.flash('error', err);
+            res.redirect('/users');
         } else {
-            // set flash message
-            req.flash('success', 'User successfully deleted! ID = ' + id)
-            // redirect to user page
-            res.redirect('/users')
+            req.flash('success', 'User deleted! ID = ' + id);
+            res.redirect('/users');
         }
-    })
-})
+    });
+});
 
 module.exports = router;
