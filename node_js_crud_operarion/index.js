@@ -11,7 +11,7 @@ var app = express();
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    res.render('users/index');
+    res.redirect('/users');
 });
 
 
