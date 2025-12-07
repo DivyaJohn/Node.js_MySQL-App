@@ -42,9 +42,9 @@ app.get('/', (req, res) => {
 // ====================
 // Routes
 // ====================
-app.get('/', (req, res) => {
-    res.redirect('/users');
-});
+// app.get('/', (req, res) => {
+//     res.redirect('/users');
+// });
 app.use('/users', usersRouter);
 
 // ====================
