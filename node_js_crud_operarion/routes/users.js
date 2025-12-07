@@ -1,7 +1,19 @@
 var express = require('express');
 var router = express.Router();
 var dbConn  = require('../lib/db');
- 
+
+// display user page
+router.get('/', function(req, res, next) {      
+    dbConn.query('SELECT * FROM users ORDER BY id desc',function(err,rows){
+        if(err) {
+            req.flash('error', err);
+            res.render('users',{data:''});
+        } else {
+            res.render('users',{data:rows});
+        }
+    });
+});
+
 // display user page
 router.get('/', function(req, res, next) {      
     dbConn.query('SELECT * FROM users ORDER BY id desc',function(err,rows)     {
@@ -14,9 +26,6 @@ router.get('/', function(req, res, next) {
             res.render('users',{data:rows});
         }
     });
-});
-router.get('/', (req, res) => {
-    res.render('users/index');  
 });
 
 // display add user page
