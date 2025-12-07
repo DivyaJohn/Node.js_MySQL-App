@@ -15,6 +15,9 @@ router.get('/', function(req, res, next) {
         }
     });
 });
+router.get('/', (req, res) => {
+    res.render('users/index');  
+});
 
 // display add user page
 router.get('/add', function(req, res, next) {    
