@@ -70,7 +70,7 @@ router.get('/edit/:id', function(req, res) {
          
         if (rows.length <= 0) {
             req.flash('error', 'User not found with id = ' + id);
-            res.redirect('/users');
+            res.redirect('/users/edit');
         } else {
             res.render('users/edit', {
                 id: rows[0].id,
@@ -122,7 +122,7 @@ router.get('/delete/:id', function(req, res) {
     dbConn.query('DELETE FROM users WHERE id = ?', [id], function(err) {
         if (err) {
             req.flash('error', err);
-            res.redirect('/users');
+            res.redirect('/users/');
         } else {
             req.flash('success', 'User deleted! ID = ' + id);
             res.redirect('/users');
