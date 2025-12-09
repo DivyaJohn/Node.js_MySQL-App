@@ -36,7 +36,7 @@ app.use(flash());
 // Correct Homepage Redirect
 // ====================
 app.get('/', (req, res) => {
-    res.redirect('/users');   // load the CRUD homepage
+    res.redirect('/users/index');   // load the CRUD homepage
 });
 
 // ====================
